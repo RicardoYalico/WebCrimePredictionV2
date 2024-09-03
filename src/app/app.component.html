@@ -1,7 +1,3 @@
-<!--<app-powerbi-modal [inputSearch]="districtSearch" #powerBiModal></app-powerbi-modal>-->
-<!--<app-parent></app-parent>-->
-<ng-template #viewContainerRef></ng-template>
-
 <app-parent #powerBiModal></app-parent>
 <div id="legend"></div>
 <div class="container-fluid g-0" >
@@ -53,9 +49,7 @@
             <h5 class="card-title mb-0">Reportes cercanos</h5>
             <div>
               <i class="bi bi-arrow-clockwise me-3"></i>
-              <!--                <i class="bi bi-plus" (click)="addReport()"></i>-->
               <i class="bi bi-plus" (click)="openFormReportModal()"></i>
-              <!--                <app-report-modal #reportModal [dataToFillForm]="{longitude: longitude, latitude: latitude, plus_code: plus_code, distrito: distrito}"></app-report-modal>-->
             </div>
           </div>
 
