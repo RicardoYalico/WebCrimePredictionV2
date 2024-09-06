@@ -1,0 +1,19 @@
+<div class="modal fade" id="powerBiModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="powerBiModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width: 750px; height: 600px">
+      <div class="modal-header">
+        <h5 class="modal-title" id="powerBiModalLabel">{{this.title}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id="modalBody" class="modal-body">
+        <div id="modalBodyNgFor" *ngFor="let component of componentsCount">
+           <powerbi-report [id]="component.id" [embedConfig]="embedConfig"></powerbi-report>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+

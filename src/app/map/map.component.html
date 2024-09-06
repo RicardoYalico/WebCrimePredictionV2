@@ -1,0 +1,123 @@
+<!--<app-parent #powerBiModal></app-parent>-->
+<app-powerbi-modal #powerBiModalRef ></app-powerbi-modal>
+
+<div id="legend"></div>
+<div class="container-fluid g-0" >
+  <div class="row g-0">
+
+    <div class="col-md-4" *ngIf="hiddenLeftPanel">
+      <!-- Container -->
+      <div class="card" >
+        <div class="card-header d-flex justify-content-end align-content-end align-items-end">
+          <button type="button" (click)="hiddenLeftPanel=false" class="btn-close " aria-label="Close"></button>
+        </div>
+        <!-- First row: Image and search bar -->
+        <div class="position-relative">
+          <img id="photo" src="" appNotImage class="card-img-top" alt="...">
+          <div class="position-absolute top-50 start-50 translate-middle w-75">
+            <input id="pac-input" type="text" class="form-control" [(ngModel)]="pac_input" placeholder="Search...">
+          </div>
+
+        </div>
+        <!-- Second row: Icons and information -->
+
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-geo-alt-fill me-2"></i>
+            <span id="address"></span>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-compass me-2"></i>
+            <span id="latLng"></span>
+          </div>
+        </div>
+        <!-- Third row: Comments list -->
+        <div class="card-footer">
+          <div class="">
+            <h5 class="card-title">Delitos cercanos</h5>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item" *ngFor="let crime of crimesToShow">
+              <div class="d-flex justify-content-between">
+                <h6 class="mb-1">{{ crime.generico }}</h6>
+                <small>{{ crime.date | date: 'yyyy' }}</small>
+              </div>
+              <p class="mb-1"><strong>Descripción:</strong> {{ crime.generico }} - {{ crime.modalidad }}</p>
+              <p class="mb-1"><strong>UBIGEO:</strong> {{ crime.ubigeo }}</p>
+              <p class="mb-1"><strong>Plus Code:</strong> {{ crime.plus_code }}</p>
+              <p class="mb-1"><strong>ID del reporte:</strong> {{ crime.ID }}</p>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Reportes cercanos</h5>
+            <div>
+              <i class="bi bi-arrow-clockwise me-3"></i>
+              <i class="bi bi-plus" (click)="openFormReportModal()"></i>
+            </div>
+          </div>
+
+          <div class="list-group">
+            <div class="list-group-item" *ngFor="let report of reportsToShow">
+              <div class="d-flex justify-content-between">
+                <h6 class="mb-1">{{ report.title }}</h6>
+                <small>{{ report.date  }}</small>
+              </div>
+              <p class="mb-1"><strong>Descripción:</strong> {{ report.description }}</p>
+              <p class="mb-1"><strong>Plus Code:</strong> {{ report.plus_code }}</p>
+              <p class="mb-1"><strong>ID del reporte:</strong> {{ report.ID }}</p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div  [ngClass]="{'col-md-8': hiddenLeftPanel}">
+      <div id="map"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">Nuevo Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #reportForm="ngForm" (ngSubmit)="onSubmit(reportForm)" >
+          <div class="mb-3">
+            <label for="title" class="form-label">Título</label>
+            <input type="text" class="form-control" id="title" name="title" ngModel>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Descripción</label>
+            <textarea class="form-control" id="description" name="description" ngModel></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="latitude" class="form-label">Latitud</label>
+            <input type="text" class="form-control" id="latitude" name="latitude" disabled [value]="this.latitude" ngModel>
+          </div>
+          <div class="mb-3">
+            <label for="longitude" class="form-label">Longitud</label>
+            <input type="text" class="form-control" id="longitude" name="longitude" disabled [value]="this.longitude" ngModel>
+          </div>
+          <div class="mb-3">
+            <label for="plus_code" class="form-label">Plus Code</label>
+            <input type="text" class="form-control" id="plus_code" name="plus_code" disabled [value]="this.plus_code" ngModel>
+          </div>
+          <div class="mb-3">
+            <label for="distrito" class="form-label">Distrito</label>
+            <input type="text" class="form-control" id="distrito" name="distrito" disabled [value]="this.distrito" ngModel>
+          </div>
+          <div class="mb-3">
+            <label for="date" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="date" name="date" ngModel>
+          </div>
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
