@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MapComponent } from './map.component';
+import { IncidenceFormComponent } from './incidence-form.component';
 
-describe('MapComponent', () => {
-  let component: MapComponent;
-  let fixture: ComponentFixture<MapComponent>;
+describe('IncidenceFormComponent', () => {
+  let component: IncidenceFormComponent;
+  let fixture: ComponentFixture<IncidenceFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MapComponent]
+      imports: [IncidenceFormComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(MapComponent);
+    fixture = TestBed.createComponent(IncidenceFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

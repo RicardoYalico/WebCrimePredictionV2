@@ -1,14 +1,8 @@
 import {
-  Component, ComponentFactoryResolver,
-  ComponentRef,
+  Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  NgZone,
-  OnInit, Type,
-  ViewChild,
-  ViewContainerRef,
+  OnInit,
 } from '@angular/core';
-import Swal from 'sweetalert2'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {RouterOutlet} from '@angular/router';
 import '@googlemaps/extended-component-library/place_overview.js';
 import '@googlemaps/extended-component-library/place_building_blocks/place_directions_button.js';
@@ -16,9 +10,7 @@ import {MapDataService} from "../services/map-data.service";
 import {ReportsService} from "../services/reports.service";
 import {HttpClientModule} from "@angular/common/http";
 import {DatePipe, NgClass, NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
-import {IReport} from "../interfaces/IReport";
 import { PowerBIEmbedModule } from 'powerbi-client-angular';
-import {Injectable, Renderer2, RendererFactory2} from '@angular/core';
 import { Loader } from "@googlemaps/js-api-loader"
 import {ChildComponent} from "./child/child.component";
 import {ParentComponent} from "./parent/parent.component";
@@ -26,7 +18,6 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NotImageDirective} from "../shared/directives/not-image.directive";
 import {DemoComponent} from "./demo/demo.component";
 import {MapComponent} from "./map/map.component";
-
 
 @Component({
   selector: 'app-root',
@@ -44,7 +35,5 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
   }
-
-
 
 }

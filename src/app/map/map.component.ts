@@ -6,8 +6,11 @@ import {ParentComponent} from "../parent/parent.component";
 import {IReport} from "../../interfaces/IReport";
 import {MapDataService} from "../../services/map-data.service";
 import {ReportsService} from "../../services/reports.service";
-import Swal from "sweetalert2";
 import {PowerbiModalComponent} from "../powerbi-modal/powerbi-modal.component";
+import {IncidenceFormComponent} from "../../shared/components/incidence-form/incidence-form.component";
+import {SideBarComponent} from "../side-bar/side-bar.component";
+import {IIncidenceForm} from "../../core/models/IIncidenceForm";
+import {Loader} from "@googlemaps/js-api-loader";
 
 @Component({
   selector: 'app-map',
@@ -21,33 +24,40 @@ import {PowerbiModalComponent} from "../powerbi-modal/powerbi-modal.component";
     ParentComponent,
     ReactiveFormsModule,
     PowerbiModalComponent,
-    NgClass
+    NgClass,
+    IncidenceFormComponent,
+    SideBarComponent
   ],
   templateUrl: './map.component.html',
   styleUrl: './map.component.css'
 })
 export class MapComponent {
   @ViewChild('powerBiModalRef') powerBiModalRef!: PowerbiModalComponent;
+  incidenceForm: IIncidenceForm = {
+    title: '',
+    description: '',
+    latitude: '',
+    longitude: '',
+    plus_code: '',
+    date: '',
+    distrito: ''
+  };
   bootstrap: any;
   index: number = 0;
   hiddenLeftPanel: boolean = false;
   title = 'SystemPredictionApp';
   infoWindow : any;
   geocoder: any;
-  currently_address = {
-    address: ""
-  };
-  pac_input = "";
+  // currently_address = {
+  //   address: ""
+  // };
+  // pac_input = "";
   powerBiToken = ''
   reports: any[] = [];
   reportsToShow: any[] = []
-  photo= "https://via.placeholder.com/300x150"
+  // photo= "https://via.placeholder.com/300x150"
   crimes: any[] = []
   crimesToShow: any[] = []
-  plus_code: string = "";
-  longitude: string = "";
-  latitude: string = ""
-  distrito: string = ""
   report: IReport= {
     title: "",
     description: "",
@@ -107,11 +117,9 @@ export class MapComponent {
     this.hiddenLeftPanel = false;
   }
 
-
   ngOnInit(): void {
     this.initMap().then();
   }
-
 
   async initMap(): Promise<void> {
     const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
@@ -145,88 +153,87 @@ export class MapComponent {
       map.data.revertStyle();
       map.data.overrideStyle(event.feature, { strokeWeight: 4 });
     });
-//
+
     let placesService = new google.maps.places.PlacesService(map);
-//
+
     const legend = document.getElementById("legend") as HTMLElement;
     const div = document.createElement("div");
     div.innerHTML = `<style>
-  .legend {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .legend-title {
-    font-weight: bold;
-    margin-right: 10px;
-  }
-  .gradient-circle {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-  }
-  .gradient1 .gradient-circle {
-    background: radial-gradient(
-      rgba(255, 0, 0, 1) 0%,
-      rgba(255, 63, 0, 1) 11%,
-      rgba(255, 127, 0, 1) 22%,
-      rgba(255, 191, 0, 1) 33%,
-      rgba(255, 255, 0, 1) 44%,
-      rgba(191, 255, 0, 1) 55%,
-      rgba(127, 255, 0, 1) 66%,
-      rgba(0, 255, 0, 1) 77%,
-      rgba(0, 255, 0, 0) 88%
-    );
-  }
-  .gradient2 .gradient-circle {
-background: radial-gradient(
-  rgba(128, 0, 128, 1) 0%,
-  rgba(159, 0, 159, 1) 11%,
-  rgba(191, 0, 191, 1) 22%,
-  rgba(223, 0, 223, 1) 33%,
-  rgba(255, 0, 255, 1) 44%,
-  rgba(255, 63, 191, 1) 55%,
-  rgba(255, 127, 127, 1) 66%,
-  rgba(255, 191, 63, 1) 77%,
-  rgba(255, 255, 0, 0) 88%
-);
-  }
-  .gradient3 .gradient-circle {
-background: radial-gradient(
-  rgba(0, 0, 255, 1) 0%,
-  rgba(0, 63, 255, 1) 11%,
-  rgba(0, 127, 255, 1) 22%,
-  rgba(0, 191, 255, 1) 33%,
-  rgba(0, 255, 255, 1) 44%,
-  rgba(0, 255, 191, 1) 55%,
-  rgba(0, 255, 127, 1) 66%,
-  rgba(0, 255, 63, 1) 77%,
-  rgba(0, 255, 0, 0) 88%
-);
-  }
-</style>
+    .legend {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .legend-title {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .gradient-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    .gradient1 .gradient-circle {
+      background: radial-gradient(
+        rgba(255, 0, 0, 1) 0%,
+        rgba(255, 63, 0, 1) 11%,
+        rgba(255, 127, 0, 1) 22%,
+        rgba(255, 191, 0, 1) 33%,
+        rgba(255, 255, 0, 1) 44%,
+        rgba(191, 255, 0, 1) 55%,
+        rgba(127, 255, 0, 1) 66%,
+        rgba(0, 255, 0, 1) 77%,
+        rgba(0, 255, 0, 0) 88%
+      );
+    }
+    .gradient2 .gradient-circle {
+      background: radial-gradient(
+        rgba(128, 0, 128, 1) 0%,
+        rgba(159, 0, 159, 1) 11%,
+        rgba(191, 0, 191, 1) 22%,
+        rgba(223, 0, 223, 1) 33%,
+        rgba(255, 0, 255, 1) 44%,
+        rgba(255, 63, 191, 1) 55%,
+        rgba(255, 127, 127, 1) 66%,
+        rgba(255, 191, 63, 1) 77%,
+        rgba(255, 255, 0, 0) 88%
+      );
+    }
+    .gradient3 .gradient-circle {
+      background: radial-gradient(
+        rgba(0, 0, 255, 1) 0%,
+        rgba(0, 63, 255, 1) 11%,
+        rgba(0, 127, 255, 1) 22%,
+        rgba(0, 191, 255, 1) 33%,
+        rgba(0, 255, 255, 1) 44%,
+        rgba(0, 255, 191, 1) 55%,
+        rgba(0, 255, 127, 1) 66%,
+        rgba(0, 255, 63, 1) 77%,
+        rgba(0, 255, 0, 0) 88%
+      );
+    }
+    </style>
 
-<div style="background-color: white; padding-inline: 5px">
-  <div class="legend gradient1 justify-content-between">
-    <div class="legend-title">Predicciones</div>
-    <div class="gradient-circle"></div>
-  </div>
+    <div style="background-color: white; padding-inline: 5px">
+      <div class="legend gradient1 justify-content-between">
+        <div class="legend-title">Predicciones</div>
+        <div class="gradient-circle"></div>
+      </div>
 
-  <div class="legend gradient2 justify-content-between">
-    <div class="legend-title">Delitos</div>
-    <div class="gradient-circle"></div>
-  </div>
+      <div class="legend gradient2 justify-content-between">
+        <div class="legend-title">Delitos</div>
+        <div class="gradient-circle"></div>
+      </div>
 
-  <div class="legend gradient3 justify-content-between">
-    <div class="legend-title">Reportes</div>
-    <div class="gradient-circle"></div>
-  </div>
-</div>` ;
+      <div class="legend gradient3 justify-content-between">
+        <div class="legend-title">Reportes</div>
+        <div class="gradient-circle"></div>
+      </div>
+    </div>` ;
     legend.appendChild(div);
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
 
     this.mapDataService.getPredictionCoordinates().subscribe(data => {
-
       let heatmapData: google.maps.LatLng[] = data.body.map((res: { lat: any; lng: any; }) => {
         return new google.maps.LatLng(res.lat, res.lng);
       });
@@ -252,14 +259,6 @@ background: radial-gradient(
       this.crimes = data.body;
 
       let heatmapData: google.maps.LatLng[] = data.body.map((res: { y: any; x: any; }) => {
-        // let crimeIcon = document.createElement('div');
-        // crimeIcon.className = 'crimeIcon';
-        // crimeIcon.textContent = '';
-        // let pinSvgMarkerView = new AdvancedMarkerElement({
-        //   map,
-        //   position: { lat: Number(res.feature.attributes.Y), lng: Number(res.feature.attributes.X) },
-        //   content: crimeIcon,
-        // });
         return new google.maps.LatLng(Number(res.y), Number(res.x)); // Asume que x es longitud y y es latitud
       });
       const heatmap = new google.maps.visualization.HeatmapLayer({
@@ -284,14 +283,7 @@ background: radial-gradient(
       this.reports = data.body;
 
       let heatmapData: google.maps.LatLng[] = this.reports.map((res: IReport) => {
-        // let crimeIcon = document.createElement('div');
-        // crimeIcon.className = 'reportIcon';
-        // crimeIcon.textContent = '';
-        // let pinSvgMarkerView = new AdvancedMarkerElement({
-        //   map,
-        //   position: { lat: Number(res.latitude), lng: Number(res.longitude) },
-        //   content: crimeIcon,
-        // });
+
         return new google.maps.LatLng(Number(res.latitude), Number(res.longitude)); // Asume que x es longitud y y es latitud
       });
       const heatmap = new google.maps.visualization.HeatmapLayer({
@@ -376,68 +368,62 @@ background: radial-gradient(
 
     map.data.addListener("rightclick", (mapsMouseEvent: any) => {
 
-
-      localStorage.clear()
-      this.latitude = mapsMouseEvent.latLng.toJSON().lat;
-      this.longitude = mapsMouseEvent.latLng.toJSON().lng;
-      localStorage.setItem('distrito', mapsMouseEvent.feature.Fg.distrito)
-      this.distrito = localStorage.getItem('distrito')? localStorage.getItem('distrito')+'':''
+      this.incidenceForm.latitude = mapsMouseEvent.latLng.toJSON().lat;
+      this.incidenceForm.longitude = mapsMouseEvent.latLng.toJSON().lng;
+      this.incidenceForm.distrito = mapsMouseEvent.feature.Fg.distrito
 
       const contentString =`
-    <title>Crime Report</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 5px;
-      }
-      .info-box {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        max-width: 300px;
-        margin: auto;
-        overflow: hidden;
-      }
-      .info-header {
-        background-color: #007BFF;
-        color: white;
-        padding: 5px;
-        text-align: center;
-        font-size: 1.5em;
-      }
-      .info-content {
-        padding: 5px;
-        font-size: 1.2em;
-      }
-      .info-content p {
-        margin: 10px 0;
-      }
-      .info-label {
-        font-weight: bold;
-        color: #333;
-      }
-      .info-value {
-        color: #555;
-      }
-      .info-divider {
-        border-top: 1px solid #eee;
-        margin: 5px 0;
-      }
-    </style>
-    </head>
-    <body>
-
-    <div class="info-box">
-      <div class="info-header">
-        Crime Report
-      </div>
-      <div class="info-content">
-        <p><span class="info-label">Latitude:</span> <span class="info-value">${this.latitude}</span></p>
-        <p><span class="info-label">Longitude:</span> <span class="info-value">${this.longitude}</span></p>
-      </div>
-    </div>
-
-    </body>`;
+      <title>Crime Report</title>
+      <style>
+         body {
+           font-family: Arial, sans-serif;
+           margin: 5px;
+         }
+         .info-box {
+           border: 1px solid #ccc;
+           border-radius: 8px;
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           max-width: 300px;
+           margin: auto;
+           overflow: hidden;
+         }
+         .info-header {
+           background-color: #007BFF;
+           color: white;
+           padding: 5px;
+           text-align: center;
+           font-size: 1.5em;
+         }
+         .info-content {
+           padding: 5px;
+           font-size: 1.2em;
+         }
+         .info-content p {
+           margin: 10px 0;
+         }
+         .info-label {
+           font-weight: bold;
+           color: #333;
+         }
+         .info-value {
+           color: #555;
+         }
+         .info-divider {
+           border-top: 1px solid #eee;
+           margin: 5px 0;
+         }
+       </style>
+      <body>
+        <div class="info-box">
+          <div class="info-header">
+            Crime Report
+          </div>
+          <div class="info-content">
+            <p><span class="info-label">Latitude:</span> <span class="info-value">${this.incidenceForm.latitude}</span></p>
+            <p><span class="info-label">Longitude:</span> <span class="info-value">${this.incidenceForm.longitude}</span></p>
+          </div>
+        </div>
+      </body>`;
 
       this.infoWindow.close();
       this.infoWindow = new google.maps.InfoWindow({
@@ -448,45 +434,43 @@ background: radial-gradient(
 
 
       this.ngZone.run(() => {
+
         this.mapDataService.getPlusCode(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng).subscribe(
           res => {
-
-            this.plus_code = this.extractFirstFourChars(res.plus_code.global_code)
+            this.incidenceForm.plus_code = this.extractFirstFourChars(res.plus_code.global_code)
             this.crimesToShow = this.crimes.filter(crime =>
-              crime.plus_code === this.plus_code
+              crime.plus_code === this.incidenceForm.plus_code
             );
-            this.manageReportsWithLatLng(this.plus_code).then();
-
+            this.manageReportsWithLatLng(this.incidenceForm.plus_code).then();
           }
         )
-
       });
 
-      this.geocoder = new google.maps.Geocoder();
-      this.geocoder.geocode(
-        {
-          'location': mapsMouseEvent.latLng,
-          'extraComputations': ["ADDRESS_DESCRIPTORS"],
-        }
-      ).then((res: any) => {
-
-        this.currently_address = {
-          address: res.results[0].formatted_address,
-        };
-        let request = {
-          placeId: res.results[0].place_id,
-          fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
-        };
-
-        placesService.getDetails(request, (response: any) => {
-          let img = (<HTMLImageElement>document.getElementById('photo'))
-
-          img.setAttribute("src", response.photos[0].getUrl())
-        })
-
-        window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
-        window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
-      })
+      // this.geocoder = new google.maps.Geocoder();
+      // this.geocoder.geocode(
+      //   {
+      //     'location': mapsMouseEvent.latLng,
+      //     'extraComputations': ["ADDRESS_DESCRIPTORS"],
+      //   }
+      // ).then((res: any) => {
+      //
+      //   // this.currently_address = {
+      //   //   address: res.results[0].formatted_address,
+      //   // };
+      //   let request = {
+      //     placeId: res.results[0].place_id,
+      //     fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
+      //   };
+      //
+      //   placesService.getDetails(request, (response: any) => {
+      //     let img = (<HTMLImageElement>document.getElementById('photo'))
+      //
+      //     img.setAttribute("src", response.photos[0].getUrl())
+      //   })
+      //
+      //   window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
+      //   window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
+      // })
 
       this.hiddenLeftPanel = true;
 
@@ -512,22 +496,12 @@ background: radial-gradient(
     )
   }
 
-  protected readonly Math = Math;
-
   extractFirstFourChars(globalCode: string): string {
     const plusIndex = globalCode.indexOf('+');
     if (plusIndex > 0) {
       return globalCode.substring(plusIndex - 4, plusIndex);
     }
     return '';
-  }
-
-  openFormReportModal() {
-    const modalElement = document.getElementById('reportModal');
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
-    }
   }
 
   openPowerBiModal() {
@@ -538,31 +512,4 @@ background: radial-gradient(
     }
   }
 
-  onSubmit(form: any) {
-    console.log('Formulario enviado:', form.value);
-    const report: IReport = {
-      title: form.value.title,
-      description: form.value.description,
-      date: form.value.date,
-      latitude: this.latitude+"",
-      longitude: this.longitude+"",
-      plus_code: this.plus_code+"",
-      distrito: this.distrito+"",
-    }
-    this.reportsService.postReport(report).subscribe(
-      res=> {
-        console.log("reporte añádido exitosamente")
-        Swal.fire({
-          title: "Incidencia enviada",
-          text: "La incidencia ha sido enviada correctamente",
-          icon: "success"
-        });
-        form.resetForm()
-      }
-    )
-    // Aquí puedes agregar la lógica para manejar el formulario enviado
-  }
-
-
-  protected readonly localStorage = localStorage;
 }
