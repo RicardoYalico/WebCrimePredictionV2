@@ -289,6 +289,7 @@ export class MapComponent {
     this.reportsService.getAllReports().subscribe(data => {
 
       this.reports = data.body;
+      console.log(this.reports)
 
       let heatmapData: google.maps.LatLng[] = this.reports.map((res: IReport) => {
 
