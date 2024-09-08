@@ -1,9 +1,19 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+  ViewContainerRef
+} from '@angular/core';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {IReport} from "../../../interfaces/IReport";
 import Swal from "sweetalert2";
 import {ReportsService} from "../../../services/reports.service";
 import {IIncidenceForm} from "../../../core/models/IIncidenceForm";
+import * as report from "report";
 
 @Component({
   selector: 'app-incidence-form',
@@ -15,8 +25,11 @@ import {IIncidenceForm} from "../../../core/models/IIncidenceForm";
   templateUrl: './incidence-form.component.html',
   styleUrl: './incidence-form.component.css'
 })
-export class IncidenceFormComponent {
-
+export class IncidenceFormComponent implements OnInit{
+  @ViewChild('closeModal') closeModal!: ElementRef
+  // @ViewChild('incidenceFormControl') incidenceFormControl!: any;
+  incidenceFormGroup: FormGroup;
+  bootstrap: any;
   incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
@@ -28,19 +41,31 @@ export class IncidenceFormComponent {
   };
 
   constructor(private reportsService: ReportsService) {
+    this.incidenceFormGroup  = new FormGroup({
+      title: new FormControl(''),
+      description: new FormControl(''),
+      date: new FormControl(''),
+      latitude: new FormControl(''),
+      longitude: new FormControl(''),
+      plus_code: new FormControl(''),
+      distrito: new FormControl(''),
+    });
   }
 
-  onSubmit(form: any) {
-    console.log('Form send:', form.value);
+  onSubmit() {
+
+
     const report: IReport = {
-      title: form.value.title,
-      description: form.value.description,
-      date: form.value.date,
-      latitude: this.incidenceForm.latitude+"",
-      longitude: this.incidenceForm.longitude+"",
-      plus_code: this.incidenceForm.plus_code+"",
-      distrito: this.incidenceForm.distrito+"",
+      title: this.incidenceFormGroup.get('title')?.value,
+      description: this.incidenceFormGroup.get('description')?.value,
+      date: this.incidenceFormGroup.get('date')?.value,
+      latitude: this.incidenceFormGroup.get('latitude')?.value,
+      longitude: this.incidenceFormGroup.get('longitude')?.value,
+      plus_code: this.incidenceFormGroup.get('plus_code')?.value,
+      distrito: this.incidenceFormGroup.get('distrito')?.value,
     }
+
+
     this.reportsService.postReport(report).subscribe(
       res=> {
         Swal.fire({
@@ -48,13 +73,29 @@ export class IncidenceFormComponent {
           text: "La incidencia ha sido enviada correctamente",
           icon: "success"
         }).then();
-        form.resetForm()
+        this.incidenceFormGroup.reset()
+        this.closeModal.nativeElement.click()
+      }, error => {
+        Swal.fire({
+          title: "Error",
+          text: "Ha ocurrido un error al enviar la incidencia",
+          icon: "error"
+        }).then();
       }
     )
+
   }
 
   updateIIncidenceModalForm(incidenceModalForm: IIncidenceForm){
-    this.incidenceForm = incidenceModalForm
+    this.incidenceFormGroup.patchValue({
+      latitude: incidenceModalForm.latitude,
+      longitude: incidenceModalForm.longitude,
+      plus_code: incidenceModalForm.plus_code,
+      distrito: incidenceModalForm.distrito,
+    })
+  }
+
+  ngOnInit(): void {
   }
 
 }

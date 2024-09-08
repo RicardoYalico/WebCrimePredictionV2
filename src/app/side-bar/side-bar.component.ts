@@ -88,6 +88,6 @@ export class SideBarComponent implements OnInit, OnChanges{
   }
 
 
-
+  protected readonly open = open;
 }
 

@@ -3,39 +3,43 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="incidenceModalLabel">Nueva Incidencia</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button #closeModal type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form #incidenceFormControl="ngForm" (ngSubmit)="onSubmit(incidenceFormControl)" >
+        <form [formGroup]="incidenceFormGroup" (ngSubmit)="onSubmit()" >
+<!--        <form class="needs-validation" novalidate #incidenceFormControl="ngForm">-->
           <div class="mb-3">
             <label for="title" class="form-label">Título</label>
-            <input type="text" class="form-control" id="title" name="title" ngModel>
+            <input type="text" class="form-control" id="title" name="title" formControlName="title" required >
+            <div class="valid-feedback">
+              Looks good!
+            </div>
           </div>
           <div class="mb-3">
             <label for="description" class="form-label">Descripción</label>
-            <textarea class="form-control" id="description" name="description" ngModel></textarea>
+            <textarea class="form-control" id="description" name="description" formControlName="description" required></textarea>
           </div>
           <div class="mb-3">
             <label for="latitude" class="form-label">Latitud</label>
-            <input type="text" class="form-control" id="latitude" name="latitude" disabled  [(ngModel)]="incidenceForm.latitude">
+            <input type="text" class="form-control" id="latitude" name="latitude" readonly  formControlName="latitude">
           </div>
           <div class="mb-3">
             <label for="longitude" class="form-label">Longitud</label>
-            <input type="text" class="form-control" id="longitude" name="longitude" disabled [(ngModel)]="incidenceForm.longitude">
+            <input type="text" class="form-control" id="longitude" name="longitude" readonly formControlName="longitude">
           </div>
           <div class="mb-3">
             <label for="plus_code" class="form-label">Plus Code</label>
-            <input type="text" class="form-control" id="plus_code" name="plus_code" disabled [(ngModel)]="incidenceForm.plus_code">
+            <input type="text" class="form-control" id="plus_code" name="plus_code" readonly formControlName="plus_code">
           </div>
           <div class="mb-3">
             <label for="distrito" class="form-label">Distrito</label>
-            <input type="text" class="form-control" id="distrito" name="distrito" disabled [(ngModel)]="incidenceForm.distrito">
+            <input type="text" class="form-control" id="distrito" name="distrito" readonly formControlName="distrito">
           </div>
           <div class="mb-3">
-            <label for="date" class="form-label">Fecha</label>
-            <input type="date" class="form-control" id="date" name="date" ngModel>
+            <label for="date" class="form-label" >Fecha</label>
+            <input type="date" class="form-control" id="date" name="date" formControlName="date" required>
           </div>
-          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Enviar</button>
+          <button class="btn btn-primary" type="submit"  [disabled]="!incidenceFormGroup.valid">Enviar</button>
         </form>
       </div>
     </div>

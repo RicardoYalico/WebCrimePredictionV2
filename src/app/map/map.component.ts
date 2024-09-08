@@ -11,6 +11,7 @@ import {IncidenceFormComponent} from "../../shared/components/incidence-form/inc
 import {SideBarComponent} from "../side-bar/side-bar.component";
 import {IIncidenceForm} from "../../core/models/IIncidenceForm";
 import {Loader} from "@googlemaps/js-api-loader";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-map',
@@ -277,9 +278,16 @@ export class MapComponent {
       ];
       heatmap.set("gradient", gradient);
       heatmap.setMap(map)
+    }, error => {
+      Swal.fire({
+        title: "Error de carga",
+        text: "Ha ocurrido un error al cargar los delitos urbanos",
+        icon: "error"
+      }).then();
     });
 
     this.reportsService.getAllReports().subscribe(data => {
+
       this.reports = data.body;
 
       let heatmapData: google.maps.LatLng[] = this.reports.map((res: IReport) => {
@@ -302,6 +310,12 @@ export class MapComponent {
       ];
       heatmap.set("gradient", gradient);
       heatmap.setMap(map)
+    }, error => {
+      Swal.fire({
+        title: "Error de carga",
+        text: "Ha ocurrido un error al cargar las incidencias",
+        icon: "error"
+      }).then();
     });
 
     const defaultBounds = {
