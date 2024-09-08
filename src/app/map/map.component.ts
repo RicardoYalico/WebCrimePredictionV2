@@ -446,31 +446,31 @@ export class MapComponent {
         )
       });
 
-      // this.geocoder = new google.maps.Geocoder();
-      // this.geocoder.geocode(
-      //   {
-      //     'location': mapsMouseEvent.latLng,
-      //     'extraComputations': ["ADDRESS_DESCRIPTORS"],
-      //   }
-      // ).then((res: any) => {
-      //
-      //   // this.currently_address = {
-      //   //   address: res.results[0].formatted_address,
-      //   // };
-      //   let request = {
-      //     placeId: res.results[0].place_id,
-      //     fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
-      //   };
-      //
-      //   placesService.getDetails(request, (response: any) => {
-      //     let img = (<HTMLImageElement>document.getElementById('photo'))
-      //
-      //     img.setAttribute("src", response.photos[0].getUrl())
-      //   })
-      //
-      //   window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
-      //   window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
-      // })
+      this.geocoder = new google.maps.Geocoder();
+      this.geocoder.geocode(
+        {
+          'location': mapsMouseEvent.latLng,
+          'extraComputations': ["ADDRESS_DESCRIPTORS"],
+        }
+      ).then((geoRes: any) => {
+
+        // this.currently_address = {
+        //   address: res.results[0].formatted_address,
+        // };
+        let request = {
+          placeId: geoRes.results[0].place_id,
+          fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
+        };
+
+        placesService.getDetails(request, (response: any) => {
+          let img = (<HTMLImageElement>document.getElementById('photo'))
+          console.log(response.photos[0].getUrl())
+          img.setAttribute("src", response.photos[0].getUrl())
+        })
+
+        // window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
+        // window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
+      })
 
       this.hiddenLeftPanel = true;
 

@@ -18,13 +18,14 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NotImageDirective} from "../shared/directives/not-image.directive";
 import {DemoComponent} from "./demo/demo.component";
 import {MapComponent} from "./map/map.component";
+import {StreetViewService} from "../core/services/street-view.service";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, HttpClientModule, NgOptimizedImage, NgForOf, PowerBIEmbedModule, ChildComponent, ParentComponent, NgIf, NgClass, DatePipe, FormsModule, ReactiveFormsModule, NotImageDirective, DemoComponent, MapComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [MapDataService, ReportsService],
+  providers: [MapDataService, ReportsService, StreetViewService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

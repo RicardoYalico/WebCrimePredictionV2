@@ -3,6 +3,7 @@ import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {IncidenceFormComponent} from "../../shared/components/incidence-form/incidence-form.component";
 import {NotImageDirective} from "../../shared/directives/not-image.directive";
 import {IIncidenceForm} from "../../core/models/IIncidenceForm";
+import {StreetViewService} from "../../core/services/street-view.service";
 
 @Component({
   selector: 'app-side-bar',
@@ -35,9 +36,8 @@ export class SideBarComponent implements OnInit, OnChanges{
   };
   bootstrap: any
 
-  constructor() {
+  constructor(private streetViewService: StreetViewService) {
   }
-
 
   openFormReportModal() {
     this.IncidenceModalForm.updateIIncidenceModalForm(this.incidenceForm)
