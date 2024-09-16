@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, OnChanges, SimpleChanges, AfterV
 import {models} from "powerbi-client";
 import {IReportEmbedConfiguration} from "embed";
 import {PowerBIEmbedModule} from "powerbi-client-angular";
+import * as pbi from 'powerbi-client'
 import {NgForOf} from "@angular/common";
 import {IDistrict} from "../../core/models/idistrict";
 import { v4 as uuidv4 } from 'uuid';

@@ -25,6 +25,7 @@
     "@types/google-maps": "^3.2.6",
     "@types/google.maps": "^3.57.0",
     "bootstrap": "^5.3.2",
+    "bootstrap-icons": "^1.11.3",
     "create-hmac": "^1.1.7",
     "crypto-js": "^4.2.0",
     "powerbi-client": "^2.23.1",
