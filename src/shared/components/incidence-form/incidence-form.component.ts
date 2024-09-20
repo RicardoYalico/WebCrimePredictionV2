@@ -33,6 +33,7 @@ export class IncidenceFormComponent implements OnInit{
   incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
+    url: '',
     latitude: '',
     longitude: '',
     plus_code: '',
@@ -43,6 +44,7 @@ export class IncidenceFormComponent implements OnInit{
   constructor(private reportsService: ReportsService) {
     this.incidenceFormGroup  = new FormGroup({
       title: new FormControl(''),
+      url: new FormControl(''),
       description: new FormControl(''),
       date: new FormControl(''),
       latitude: new FormControl(''),
@@ -58,6 +60,7 @@ export class IncidenceFormComponent implements OnInit{
     const report: IReport = {
       title: this.incidenceFormGroup.get('title')?.value,
       description: this.incidenceFormGroup.get('description')?.value,
+      url: this.incidenceFormGroup.get('url')?.value,
       date: this.incidenceFormGroup.get('date')?.value,
       latitude: this.incidenceFormGroup.get('latitude')?.value,
       longitude: this.incidenceFormGroup.get('longitude')?.value,
