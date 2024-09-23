@@ -12,6 +12,8 @@ import {SideBarComponent} from "../side-bar/side-bar.component";
 import {IIncidenceForm} from "../../core/models/IIncidenceForm";
 import {Loader} from "@googlemaps/js-api-loader";
 import Swal from "sweetalert2";
+import {StreetViewService} from "../../core/services/street-view.service";
+
 
 @Component({
   selector: 'app-map',
@@ -37,6 +39,7 @@ export class MapComponent {
   incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
+    url: '',
     latitude: '',
     longitude: '',
     plus_code: '',
@@ -62,6 +65,7 @@ export class MapComponent {
   report: IReport= {
     title: "",
     description: "",
+    url: "",
     latitude: "",
     longitude: "",
     plus_code: "",
@@ -114,7 +118,7 @@ export class MapComponent {
       {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-77.022812,-12.090812],[-77.030168,-12.09191],[-77.029879,-12.091189],[-77.033459,-12.09073],[-77.033734,-12.08917],[-77.043172,-12.090455],[-77.043062,-12.091201],[-77.046453,-12.091672],[-77.047617,-12.091576],[-77.048589,-12.085016],[-77.050115,-12.086919],[-77.053271,-12.093017],[-77.054996,-12.09191],[-77.055768,-12.093387],[-77.057385,-12.092553],[-77.058885,-12.096404],[-77.058385,-12.09667],[-77.060201,-12.099889],[-77.060779,-12.102133],[-77.060309,-12.105168],[-77.060432,-12.106591],[-77.061331,-12.107775],[-77.060483,-12.108273],[-77.056032,-12.111583],[-77.054463,-12.109875],[-77.053268,-12.108965],[-77.0514,-12.110352],[-77.04927,-12.108369],[-77.046691,-12.110941],[-77.046186,-12.110463],[-77.04415,-12.110477],[-77.043113,-12.110846],[-77.040463,-12.108346],[-77.039041,-12.109752],[-77.03825,-12.108975],[-77.037156,-12.110066],[-77.036611,-12.110025],[-77.031488,-12.103551],[-77.027379,-12.102879],[-77.018766,-12.101922],[-77.016412,-12.102297],[-77.016119,-12.103562],[-77.016553,-12.105568],[-77.014691,-12.108041],[-77.010497,-12.107289],[-77.011916,-12.100825],[-77.012116,-12.099111],[-77.011615,-12.097101],[-77.007712,-12.089864],[-77.007652,-12.088675],[-77.009848,-12.088959],[-77.022812,-12.090812]]]},"properties":{"id":50,"departamento":"LIMA","provincia":"LIMA","distrito":"SAN ISIDRO","institucion":"IGN","distrito2":"San Isidro"}}
     ]}
 
-  constructor(private ngZone: NgZone, private mapDataService: MapDataService, private reportsService: ReportsService) {
+  constructor(private ngZone: NgZone, private mapDataService: MapDataService, private reportsService: ReportsService, private streetViewService: StreetViewService) {
     this.hiddenLeftPanel = false;
   }
 
@@ -289,7 +293,6 @@ export class MapComponent {
     this.reportsService.getAllReports().subscribe(data => {
 
       this.reports = data.body;
-      console.log(this.reports)
 
       let heatmapData: google.maps.LatLng[] = this.reports.map((res: IReport) => {
 
@@ -476,12 +479,43 @@ export class MapComponent {
           placeId: geoRes.results[0].place_id,
           fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
         };
+        console.log(geoRes.results[0].formatted_address);
 
-        placesService.getDetails(request, (response: any) => {
-          let img = (<HTMLImageElement>document.getElementById('photo'))
-          console.log(response.photos[0].getUrl())
-          img.setAttribute("src", response.photos[0].getUrl())
-        })
+        this.streetViewService.getSignedUrl(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng,geoRes.results[0].formatted_address).subscribe(
+          resStatusImage => {
+            console.log(resStatusImage)
+            let img = (<HTMLImageElement>document.getElementById('photo'))
+            img.setAttribute("src", resStatusImage.body.urlImage)
+          })
+
+        // let placeSearchRequest = {
+        //
+        // }
+
+        // placesService.nearbySearch({
+        //   location: mapsMouseEvent.latLng,
+        //   radius: 50000
+        // }, (response: any)=>{
+        //   for (let i=0; i < response.length; i++){
+        //     for (let h=0; h < response[i].photos.length; h++){
+        //       if(response[i].photos[h]){
+        //
+        //         console.log(response[i].photos[h].getUrl())
+        //         let img = (<HTMLImageElement>document.getElementById('photo'))
+        //         img.setAttribute("src", response[i].photos[h].getUrl())
+        //         // i= response.length;
+        //         break
+        //       }
+        //     }
+        //   }
+        // })
+
+        // placesService.getDetails(request, (response: any) => {
+        //   let img = (<HTMLImageElement>document.getElementById('photo'))
+        //
+        //
+        //   img.setAttribute("src", response.photos[0].getUrl())
+        // })
 
         // window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
         // window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
@@ -526,5 +560,7 @@ export class MapComponent {
       modal.show();
     }
   }
+
+
 
 }

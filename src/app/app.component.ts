@@ -26,7 +26,7 @@ import Swal from "sweetalert2";
   standalone: true,
   imports: [RouterOutlet, HttpClientModule, NgOptimizedImage, NgForOf, PowerBIEmbedModule, ChildComponent, ParentComponent, NgIf, NgClass, DatePipe, FormsModule, ReactiveFormsModule, NotImageDirective, DemoComponent, MapComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [MapDataService, ReportsService, StreetViewService],
+  providers: [MapDataService, ReportsService, StreetViewService, StreetViewService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

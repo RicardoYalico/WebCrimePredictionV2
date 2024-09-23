@@ -28,6 +28,7 @@ export class SideBarComponent implements OnInit, OnChanges{
   @Input() incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
+    url: '',
     latitude: '',
     longitude: '',
     plus_code: '',
@@ -65,8 +66,8 @@ export class SideBarComponent implements OnInit, OnChanges{
       }
     ).then((res: any) => {
 
-      console.log(res)
       this.formated_address = res.results[0].formatted_address;
+
       this.loading = false;
       // this.currently_address = {
       //   address: res.results[0].formatted_address,
