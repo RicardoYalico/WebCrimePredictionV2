@@ -14,13 +14,15 @@ import Swal from "sweetalert2";
 import {ReportsService} from "../../../services/reports.service";
 import {IIncidenceForm} from "../../../core/models/IIncidenceForm";
 import * as report from "report";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-incidence-form',
   standalone: true,
   imports: [
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './incidence-form.component.html',
   styleUrl: './incidence-form.component.css'
@@ -28,12 +30,13 @@ import * as report from "report";
 export class IncidenceFormComponent implements OnInit{
   @ViewChild('closeModal') closeModal!: ElementRef
   // @ViewChild('incidenceFormControl') incidenceFormControl!: any;
+  loading: boolean = false;
   incidenceFormGroup: FormGroup;
+  distritoPorDefecto: string = 'SAN MIGUEL';
   bootstrap: any;
   incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
-    url: '',
     latitude: '',
     longitude: '',
     plus_code: '',
@@ -56,11 +59,10 @@ export class IncidenceFormComponent implements OnInit{
 
   onSubmit() {
 
-
+    this.loading = true;
     const report: IReport = {
       title: this.incidenceFormGroup.get('title')?.value,
       description: this.incidenceFormGroup.get('description')?.value,
-      url: this.incidenceFormGroup.get('url')?.value,
       date: this.incidenceFormGroup.get('date')?.value,
       latitude: this.incidenceFormGroup.get('latitude')?.value,
       longitude: this.incidenceFormGroup.get('longitude')?.value,
@@ -71,6 +73,7 @@ export class IncidenceFormComponent implements OnInit{
 
     this.reportsService.postReport(report).subscribe(
       res=> {
+
         Swal.fire({
           title: "Incidencia enviada",
           text: "La incidencia ha sido enviada correctamente",
@@ -78,6 +81,8 @@ export class IncidenceFormComponent implements OnInit{
         }).then();
         this.incidenceFormGroup.reset()
         this.closeModal.nativeElement.click()
+        this.refresh();
+        this.loading = false;
       }, error => {
         Swal.fire({
           title: "Error",
@@ -85,6 +90,7 @@ export class IncidenceFormComponent implements OnInit{
           icon: "error"
         }).then();
       }
+
     )
 
   }
@@ -101,4 +107,7 @@ export class IncidenceFormComponent implements OnInit{
   ngOnInit(): void {
   }
 
+  refresh(): void {
+    window.location.reload();
+  }
 }

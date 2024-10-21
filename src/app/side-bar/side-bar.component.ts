@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {IncidenceFormComponent} from "../../shared/components/incidence-form/incidence-form.component";
 import {NotImageDirective} from "../../shared/directives/not-image.directive";
@@ -20,6 +20,7 @@ import {StreetViewService} from "../../core/services/street-view.service";
 })
 export class SideBarComponent implements OnInit, OnChanges{
   @ViewChild('IncidenceModalForm') IncidenceModalForm!: IncidenceFormComponent;
+  @Output() closeSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
   hiddenLeftPanel: boolean = false;
   loading: boolean = true;
   formated_address: string = '';
@@ -28,7 +29,6 @@ export class SideBarComponent implements OnInit, OnChanges{
   @Input() incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
-    url: '',
     latitude: '',
     longitude: '',
     plus_code: '',
@@ -42,6 +42,7 @@ export class SideBarComponent implements OnInit, OnChanges{
 
   openFormReportModal() {
     this.IncidenceModalForm.updateIIncidenceModalForm(this.incidenceForm)
+
     const modalElement = document.getElementById('incidenceModalForm');
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
@@ -88,7 +89,9 @@ export class SideBarComponent implements OnInit, OnChanges{
     })
   }
 
-
+  sendCloseSideBar() {
+    this.closeSideBar.emit(false);
+  }
   protected readonly open = open;
 }
 

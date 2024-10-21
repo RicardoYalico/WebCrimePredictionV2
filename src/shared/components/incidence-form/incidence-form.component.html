@@ -16,37 +16,89 @@
             </div>
           </div>
           <div class="mb-3">
-            <label for="url" class="form-label">URL Image</label>
-            <input type="text" class="form-control" id="url" name="url" formControlName="url" required >
-            <div class="valid-feedback">
-              Looks good!
-            </div>
-          </div>
-          <div class="mb-3">
             <label for="description" class="form-label">Descripción</label>
             <textarea class="form-control" id="description" name="description" formControlName="description" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="latitude" class="form-label">Latitud</label>
-            <input type="text" class="form-control" id="latitude" name="latitude" readonly  formControlName="latitude">
-          </div>
-          <div class="mb-3">
-            <label for="longitude" class="form-label">Longitud</label>
-            <input type="text" class="form-control" id="longitude" name="longitude" readonly formControlName="longitude">
-          </div>
-          <div class="mb-3">
-            <label for="plus_code" class="form-label">Plus Code</label>
-            <input type="text" class="form-control" id="plus_code" name="plus_code" readonly formControlName="plus_code">
-          </div>
-          <div class="mb-3">
-            <label for="distrito" class="form-label">Distrito</label>
-            <input type="text" class="form-control" id="distrito" name="distrito" readonly formControlName="distrito">
           </div>
           <div class="mb-3">
             <label for="date" class="form-label" >Fecha</label>
             <input type="date" class="form-control" id="date" name="date" formControlName="date" required>
           </div>
-          <button class="btn btn-primary" type="submit"  [disabled]="!incidenceFormGroup.valid">Enviar</button>
+          <div class="mb-3">
+            <label for="latitude" class="form-label">Latitud</label>
+            <input type="number" min="-90" max="90" class="form-control" id="latitude" name="latitude" formControlName="latitude" required>
+          </div>
+          <div class="mb-3">
+            <label for="longitude" class="form-label">Longitud</label>
+            <input type="number" min="-180" max="180" class="form-control" id="longitude" name="longitude" formControlName="longitude" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="plus_code" class="form-label">Plus Code</label>
+            <input type="text" class="form-control" id="plus_code" name="plus_code" formControlName="plus_code">
+          </div>
+<!--          <div class="mb-3">-->
+<!--            <label for="distrito" class="form-label">Distrito</label>-->
+<!--            <input type="text" class="form-control" id="distrito" name="distrito" formControlName="distrito">-->
+<!--          </div>-->
+          <div class="mb-3">
+            <label for="distrito" class="form-label">Distrito</label>
+            <select
+              class="form-control"
+              id="distrito"
+              name="distrito"
+              formControlName="distrito"
+              >
+              <option value="ANCON">ANCON</option>
+              <option value="ATE">ATE</option>
+              <option value="BARRANCO">BARRANCO</option>
+              <option value="BREÑA">BREÑA</option>
+              <option value="CARABAYLLO">CARABAYLLO</option>
+              <option value="CHACLACAYO">CHACLACAYO</option>
+              <option value="CHORRILLOS">CHORRILLOS</option>
+              <option value="CIENEGUILLA">CIENEGUILLA</option>
+              <option value="COMAS">COMAS</option>
+              <option value="EL AGUSTINO">EL AGUSTINO</option>
+              <option value="INDEPENDENCIA">INDEPENDENCIA</option>
+              <option value="JESUS MARIA">JESUS MARIA</option>
+              <option value="LA MOLINA">LA MOLINA</option>
+              <option value="LA VICTORIA">LA VICTORIA</option>
+              <option value="LINCE">LINCE</option>
+              <option value="LOS OLIVOS">LOS OLIVOS</option>
+              <option value="LURIGANCHO">LURIGANCHO</option>
+              <option value="LURIN">LURIN</option>
+              <option value="MAGDALENA DEL MAR">MAGDALENA DEL MAR</option>
+              <option value="MAGDALENA VIEJA">MAGDALENA VIEJA</option>
+              <option value="MIRAFLORES">MIRAFLORES</option>
+              <option value="PACHACAMAC">PACHACAMAC</option>
+              <option value="PUEBLO LIBRE">PUEBLO LIBRE</option>
+              <option value="PUCUSANA">PUCUSANA</option>
+              <option value="PUENTE PIEDRA">PUENTE PIEDRA</option>
+              <option value="PUNTA HERMOSA">PUNTA HERMOSA</option>
+              <option value="PUNTA NEGRA">PUNTA NEGRA</option>
+              <option value="RIMAC">RIMAC</option>
+              <option value="SAN BARTOLO">SAN BARTOLO</option>
+              <option value="SAN BORJA">SAN BORJA</option>
+              <option value="SAN ISIDRO">SAN ISIDRO</option>
+              <option value="SAN JUAN DE LURIGANCHO">SAN JUAN DE LURIGANCHO</option>
+              <option value="SAN JUAN DE MIRAFLORES">SAN JUAN DE MIRAFLORES</option>
+              <option value="SAN LUIS">SAN LUIS</option>
+              <option value="SAN MARTIN DE PORRES">SAN MARTIN DE PORRES</option>
+              <option value="SAN MIGUEL">SAN MIGUEL</option>
+              <option value="SANTA ANITA">SANTA ANITA</option>
+              <option value="SANTA MARIA DEL MAR">SANTA MARIA DEL MAR</option>
+              <option value="SANTA ROSA">SANTA ROSA</option>
+              <option value="SANTIAGO DE SURCO">SANTIAGO DE SURCO</option>
+              <option value="SURQUILLO">SURQUILLO</option>
+              <option value="VILLA EL SALVADOR">VILLA EL SALVADOR</option>
+              <option value="VILLA MARIA DEL TRIUNFO">VILLA MARIA DEL TRIUNFO</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" type="submit"  [disabled]="!incidenceFormGroup.valid || loading">
+            <div class="spinner-border spinner-border-sm" role="status" *ngIf="loading">
+              <span class="sr-only"></span>
+            </div>
+            Enviar</button>
         </form>
       </div>
     </div>

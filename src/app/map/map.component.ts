@@ -39,7 +39,6 @@ export class MapComponent {
   incidenceForm: IIncidenceForm = {
     title: '',
     description: '',
-    url: '',
     latitude: '',
     longitude: '',
     plus_code: '',
@@ -65,7 +64,6 @@ export class MapComponent {
   report: IReport= {
     title: "",
     description: "",
-    url: "",
     latitude: "",
     longitude: "",
     plus_code: "",
