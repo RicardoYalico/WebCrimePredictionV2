@@ -8,7 +8,7 @@ import {environment} from "../../../environments/environment";
 @Injectable()
 export class ReportsService {
 
-  private reports_apiUrl = environment.getReportsFunction;
+  private reports_apiUrl = environment.ReportFunction;
   private headers = {"Content-Type": "application/json"};
 
 

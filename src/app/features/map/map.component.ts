@@ -12,7 +12,7 @@ import {IIncidenceForm} from "../../core/models/IIncidenceForm";
 import {Loader} from "@googlemaps/js-api-loader";
 import Swal from "sweetalert2";
 import {StreetViewService} from "../../core/services/street-view.service";
-import {environment} from "../../../environments/environment.prod";
+import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-map',
@@ -125,6 +125,7 @@ export class MapComponent {
   });
 
   async myMapFunction(): Promise<void>{
+
     this.loader.load().then(async () => {
       const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
       const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
@@ -474,12 +475,12 @@ export class MapComponent {
         this.hiddenLeftPanel = true;
       });
 
-      map.data.addListener("click", (mapsMouseEvent: any) => {
-        this.ngZone.run(() => {
-          this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
-        });
-        this.openPowerBiModal()
-      });
+      // map.data.addListener("click", (mapsMouseEvent: any) => {
+      //   this.ngZone.run(() => {
+      //     this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
+      //   });
+      //   this.openPowerBiModal()
+      // });
     });
   }
 
@@ -835,12 +836,12 @@ export class MapComponent {
       this.hiddenLeftPanel = true;
     });
 
-    map.data.addListener("click", (mapsMouseEvent: any) => {
-      this.ngZone.run(() => {
-        this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
-      });
-      this.openPowerBiModal()
-    });
+    // map.data.addListener("click", (mapsMouseEvent: any) => {
+    //   this.ngZone.run(() => {
+    //     this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
+    //   });
+    //   this.openPowerBiModal()
+    // });
   }
 
   // async initMap(): Promise<void> {

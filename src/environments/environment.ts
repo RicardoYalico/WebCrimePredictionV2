@@ -1,11 +1,12 @@
 export const environment = {
   production: false,
-  signServiceUrl:'https://s9hk4juha2.execute-api.us-east-1.amazonaws.com/dev',
-  getPredictionCoodinatesWithPlusCodeUrl:'https://7k1nhkx21d.execute-api.us-east-1.amazonaws.com/dev/',
-  getCrimeCoordinatesWithPlusCode:'https://lg8hjv4o1c.execute-api.us-east-1.amazonaws.com/dev/',
-  postReportFunction: 'https://8yi27bsvt0.execute-api.us-east-1.amazonaws.com/dev',
-  getReportsFunction:'https://8yi27bsvt0.execute-api.us-east-1.amazonaws.com/dev',
+  signServiceUrl:import.meta.env.NG_APP_SIGN_SERVICE_URL,
+  PredictionCoordinatesWithPlusCodeUrl:import.meta.env.NG_APP_PREDICTION_URL,
+  CrimeCoordinatesWithPlusCode: import.meta.env.NG_APP_CRIMES_URL,
+  ReportFunction: import.meta.env.NG_APP_REPORTS_URL,
 
-  feedbackUrl: 'https://formspree.io/f/xovazbvy',
+  google_apikey: import.meta.env.NG_APP_GOOGLE_APIKEY,
+
+  feedbackUrl: import.meta.env.NG_APP_FEEDBACK_URL,
 
 };

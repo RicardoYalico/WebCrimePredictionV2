@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrl: './powerbi-modal.component.css'
 })
 
+
+
 export class PowerbiModalComponent {
   componentsCount: IDistrict[] = [];
   title = ''

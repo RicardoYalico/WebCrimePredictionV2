@@ -8,8 +8,8 @@ import {environment} from "../../../environments/environment";
 export class MapDataService {
   private headers = {"Content-Type": "application/json"};
 
-  private crime_apiUrl = environment.getCrimeCoordinatesWithPlusCode;
-  private prediction_apiUrl = environment.getPredictionCoodinatesWithPlusCodeUrl;
+  private crime_apiUrl = environment.CrimeCoordinatesWithPlusCode;
+  private prediction_apiUrl = environment.PredictionCoordinatesWithPlusCodeUrl;
   constructor(private http: HttpClient) { }
 
   getAllCrimes(): Observable<any> {
