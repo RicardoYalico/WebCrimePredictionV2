@@ -129,7 +129,7 @@ export class MapComponent {
     let map = new Map(document.getElementById("map") as HTMLElement, {
       center: { lat: -12.089026, lng: -77.103876 },
       zoom: 16,
-      mapId: 'de588f509abe65c9',
+      // mapId: 'de588f509abe65c9',
     });
 
     map.data.addGeoJson(

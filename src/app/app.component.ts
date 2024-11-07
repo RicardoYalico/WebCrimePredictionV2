@@ -17,6 +17,7 @@ import {NotImageDirective} from "./shared/directives/not-image.directive";
 import {MapComponent} from "./features/map/map.component";
 import {StreetViewService} from "./core/services/street-view.service";
 import Swal from "sweetalert2";
+import {environment} from "../environments/environment";
 
 @Component({
   selector: 'app-root',
@@ -44,7 +45,7 @@ export class AppComponent implements OnInit{
   onSubmit() {
     if (this.feedbackFormGroup.valid) {
       const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-      this.http.post('https://formspree.io/f/xovazbvy',
+      this.http.post(environment.feedbackUrl,
         {replyto: this.feedbackFormGroup.get('feedbackEmail')?.value, message: this.feedbackFormGroup.get('emailDescription')?.value },
         { 'headers': headers }).subscribe(
             (response: any) => {

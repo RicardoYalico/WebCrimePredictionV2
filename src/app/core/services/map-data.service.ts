@@ -2,13 +2,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {environment} from "../../../environments/environment";
 
 @Injectable()
 export class MapDataService {
   private headers = {"Content-Type": "application/json"};
 
-  private crime_apiUrl = 'https://lg8hjv4o1c.execute-api.us-east-1.amazonaws.com/dev';
-  private prediction_apiUrl = 'https://7k1nhkx21d.execute-api.us-east-1.amazonaws.com/dev/'
+  private crime_apiUrl = environment.getCrimeCoordinatesWithPlusCode;
+  private prediction_apiUrl = environment.getPredictionCoodinatesWithPlusCodeUrl;
   constructor(private http: HttpClient) { }
 
   getAllCrimes(): Observable<any> {
