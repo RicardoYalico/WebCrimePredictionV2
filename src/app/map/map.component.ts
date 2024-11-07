@@ -51,14 +51,9 @@ export class MapComponent {
   title = 'SystemPredictionApp';
   infoWindow : any;
   geocoder: any;
-  // currently_address = {
-  //   address: ""
-  // };
-  // pac_input = "";
   powerBiToken = ''
   reports: any[] = [];
   reportsToShow: any[] = []
-  // photo= "https://via.placeholder.com/300x150"
   crimes: any[] = []
   crimesToShow: any[] = []
   report: IReport= {
@@ -233,7 +228,9 @@ export class MapComponent {
         <div class="gradient-circle"></div>
       </div>
     </div>` ;
+
     legend.appendChild(div);
+
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
 
     this.mapDataService.getPredictionCoordinates().subscribe(data => {
@@ -358,14 +355,6 @@ export class MapComponent {
           return;
         }
 
-        let icon = {
-          url: place.icon as string,
-          size: new google.maps.Size(71, 71),
-          origin: new google.maps.Point(0, 0),
-          anchor: new google.maps.Point(17, 34),
-          scaledSize: new google.maps.Size(25, 25),
-        };
-
         markers.push(
           new AdvancedMarkerElement({
             map,
@@ -448,7 +437,6 @@ export class MapComponent {
       });
       this.infoWindow.open(map);
 
-
       this.ngZone.run(() => {
 
         this.mapDataService.getPlusCode(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng).subscribe(
@@ -470,57 +458,14 @@ export class MapComponent {
         }
       ).then((geoRes: any) => {
 
-        // this.currently_address = {
-        //   address: res.results[0].formatted_address,
-        // };
-        let request = {
-          placeId: geoRes.results[0].place_id,
-          fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
-        };
-        console.log(geoRes.results[0].formatted_address);
 
         this.streetViewService.getSignedUrl(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng,geoRes.results[0].formatted_address).subscribe(
           resStatusImage => {
-            console.log(resStatusImage)
             let img = (<HTMLImageElement>document.getElementById('photo'))
             img.setAttribute("src", resStatusImage.body.urlImage)
           })
-
-        // let placeSearchRequest = {
-        //
-        // }
-
-        // placesService.nearbySearch({
-        //   location: mapsMouseEvent.latLng,
-        //   radius: 50000
-        // }, (response: any)=>{
-        //   for (let i=0; i < response.length; i++){
-        //     for (let h=0; h < response[i].photos.length; h++){
-        //       if(response[i].photos[h]){
-        //
-        //         console.log(response[i].photos[h].getUrl())
-        //         let img = (<HTMLImageElement>document.getElementById('photo'))
-        //         img.setAttribute("src", response[i].photos[h].getUrl())
-        //         // i= response.length;
-        //         break
-        //       }
-        //     }
-        //   }
-        // })
-
-        // placesService.getDetails(request, (response: any) => {
-        //   let img = (<HTMLImageElement>document.getElementById('photo'))
-        //
-        //
-        //   img.setAttribute("src", response.photos[0].getUrl())
-        // })
-
-        // window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
-        // window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
       })
-
       this.hiddenLeftPanel = true;
-
     });
 
     map.data.addListener("click", (mapsMouseEvent: any) => {
@@ -536,9 +481,7 @@ export class MapComponent {
       res => {
         this.reportsToShow = res.body.filter((report: IReport) =>
           report.plus_code === global_code
-
         );
-
       },
     )
   }
@@ -558,7 +501,4 @@ export class MapComponent {
       modal.show();
     }
   }
-
-
-
 }

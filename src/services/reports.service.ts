@@ -8,7 +8,6 @@ import {IReport} from "../interfaces/IReport";
 export class ReportsService {
 
   private apiUrl = 'https://8yi27bsvt0.execute-api.us-east-1.amazonaws.com/dev';
-  // private apiUrl = ' ';
   private headers = {"Content-Type": "application/json"};
 
 

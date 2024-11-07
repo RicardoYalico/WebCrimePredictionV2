@@ -8,13 +8,8 @@ export class MapDataService {
   private headers = {"Content-Type": "application/json"};
 
   private crime_apiUrl = 'https://lg8hjv4o1c.execute-api.us-east-1.amazonaws.com/dev';
-  // private crime_apiUrl = '';
   private prediction_apiUrl = 'https://7k1nhkx21d.execute-api.us-east-1.amazonaws.com/dev/'
-  // private prediction_apiUrl = ''
-
   constructor(private http: HttpClient) { }
-
-
 
   getAllCrimes(): Observable<any> {
     return this.http.get(this.crime_apiUrl, {headers: this.headers});
