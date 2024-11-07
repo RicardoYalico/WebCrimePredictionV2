@@ -12,7 +12,7 @@ import {IIncidenceForm} from "../../core/models/IIncidenceForm";
 import {Loader} from "@googlemaps/js-api-loader";
 import Swal from "sweetalert2";
 import {StreetViewService} from "../../core/services/street-view.service";
-
+import {environment} from "../../../environments/environment.prod";
 
 @Component({
   selector: 'app-map',
@@ -114,10 +114,379 @@ export class MapComponent {
   }
 
   ngOnInit(): void {
-    this.initMap().then();
+    // this.initMap().then();
+    this.myMapFunction().then();
   }
 
+  loader = new Loader({
+    apiKey: environment.google_apikey,
+    version: "beta",
+    libraries: ["visualization", "places"]
+  });
+
+  async myMapFunction(): Promise<void>{
+    this.loader.load().then(async () => {
+      const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
+      const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
+      const center = { lat: 50.064192, lng: -130.605469 };
+
+      this.infoWindow = new google.maps.InfoWindow({
+        content: "Click the map to get Lat/Lng!",
+        position: center,
+      });
+      let map = new Map(document.getElementById("map") as HTMLElement, {
+        center: { lat: -12.089026, lng: -77.103876 },
+        zoom: 16,
+        // mapId: 'de588f509abe65c9',
+      });
+
+      map.data.addGeoJson(
+        this.city_polygons
+      );
+
+      map.data.setStyle((feature) => {
+        let color = "green";
+        return /** @type {!google.maps.Data.StyleOptions} */ {
+          fillColor: color,
+          strokeColor: color,
+          strokeWeight: 0.6,
+        };
+      });
+
+      map.data.addListener("mouseover", (event: any) => {
+        map.data.revertStyle();
+        map.data.overrideStyle(event.feature, { strokeWeight: 4 });
+      });
+
+      let placesService = new google.maps.places.PlacesService(map);
+
+      const legend = document.getElementById("legend") as HTMLElement;
+      const div = document.createElement("div");
+      div.innerHTML = `<style>
+    .legend {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .legend-title {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .gradient-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    .gradient1 .gradient-circle {
+      background: radial-gradient(
+        rgba(255, 0, 0, 1) 0%,
+        rgba(255, 63, 0, 1) 11%,
+        rgba(255, 127, 0, 1) 22%,
+        rgba(255, 191, 0, 1) 33%,
+        rgba(255, 255, 0, 1) 44%,
+        rgba(191, 255, 0, 1) 55%,
+        rgba(127, 255, 0, 1) 66%,
+        rgba(0, 255, 0, 1) 77%,
+        rgba(0, 255, 0, 0) 88%
+      );
+    }
+    .gradient2 .gradient-circle {
+      background: radial-gradient(
+        rgba(128, 0, 128, 1) 0%,
+        rgba(159, 0, 159, 1) 11%,
+        rgba(191, 0, 191, 1) 22%,
+        rgba(223, 0, 223, 1) 33%,
+        rgba(255, 0, 255, 1) 44%,
+        rgba(255, 63, 191, 1) 55%,
+        rgba(255, 127, 127, 1) 66%,
+        rgba(255, 191, 63, 1) 77%,
+        rgba(255, 255, 0, 0) 88%
+      );
+    }
+    .gradient3 .gradient-circle {
+      background: radial-gradient(
+        rgba(0, 0, 255, 1) 0%,
+        rgba(0, 63, 255, 1) 11%,
+        rgba(0, 127, 255, 1) 22%,
+        rgba(0, 191, 255, 1) 33%,
+        rgba(0, 255, 255, 1) 44%,
+        rgba(0, 255, 191, 1) 55%,
+        rgba(0, 255, 127, 1) 66%,
+        rgba(0, 255, 63, 1) 77%,
+        rgba(0, 255, 0, 0) 88%
+      );
+    }
+    </style>
+
+    <div style="background-color: white; padding-inline: 5px">
+      <div class="legend gradient1 justify-content-between">
+        <div class="legend-title">Predicciones</div>
+        <div class="gradient-circle"></div>
+      </div>
+
+      <div class="legend gradient2 justify-content-between">
+        <div class="legend-title">Delitos</div>
+        <div class="gradient-circle"></div>
+      </div>
+
+      <div class="legend gradient3 justify-content-between">
+        <div class="legend-title">Reportes</div>
+        <div class="gradient-circle"></div>
+      </div>
+    </div>` ;
+
+      legend.appendChild(div);
+
+      map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+
+      this.mapDataService.getPredictionCoordinates().subscribe(data => {
+        let heatmapData: google.maps.LatLng[] = data.body.map((res: { lat: any; lng: any; }) => {
+          return new google.maps.LatLng(res.lat, res.lng);
+        });
+        const heatmap = new google.maps.visualization.HeatmapLayer({
+          data: heatmapData
+        });
+        const gradient = [
+          "rgba(0, 255, 0, 0)",     // Transparente
+          "rgba(0, 255, 0, 1)",     // Verde
+          "rgba(127, 255, 0, 1)",   // Verde claro
+          "rgba(191, 255, 0, 1)",   // Amarillo verdoso
+          "rgba(255, 255, 0, 1)",   // Amarillo
+          "rgba(255, 191, 0, 1)",   // Naranja claro
+          "rgba(255, 127, 0, 1)",   // Naranja
+          "rgba(255, 63, 0, 1)",    // Rojo anaranjado
+          "rgba(255, 0, 0, 1)",
+        ];
+        heatmap.set("gradient", gradient);
+        heatmap.setMap(map)
+      });
+
+      this.mapDataService.getAllCrimes().subscribe(data => {
+        this.crimes = data.body;
+
+        let heatmapData: google.maps.LatLng[] = data.body.map((res: { y: any; x: any; }) => {
+          return new google.maps.LatLng(Number(res.y), Number(res.x)); // Asume que x es longitud y y es latitud
+        });
+        const heatmap = new google.maps.visualization.HeatmapLayer({
+          data: heatmapData
+        });
+        const gradient = [
+          "rgba(128, 0, 128, 0)",     // Transparente
+          "rgba(128, 0, 128, 1)",     // Púrpura oscuro
+          "rgba(159, 0, 159, 1)",     // Púrpura
+          "rgba(191, 0, 191, 1)",     // Púrpura claro
+          "rgba(223, 0, 223, 1)",     // Magenta
+          "rgba(255, 0, 255, 1)",     // Magenta intenso
+          "rgba(255, 63, 191, 1)",    // Rosa
+          "rgba(255, 127, 127, 1)",   // Rosa claro
+          "rgba(255, 191, 63, 1)"     // Naranja rosado
+        ];
+        heatmap.set("gradient", gradient);
+        heatmap.setMap(map)
+      }, error => {
+        Swal.fire({
+          title: "Error de carga",
+          text: "Ha ocurrido un error al cargar los delitos urbanos",
+          icon: "error"
+        }).then();
+      });
+
+      this.reportsService.getAllReports().subscribe(data => {
+
+        this.reports = data.body;
+
+        let heatmapData: google.maps.LatLng[] = this.reports.map((res: IReport) => {
+
+          return new google.maps.LatLng(Number(res.latitude), Number(res.longitude)); // Asume que x es longitud y y es latitud
+        });
+        const heatmap = new google.maps.visualization.HeatmapLayer({
+          data: heatmapData
+        });
+        const gradient = [
+          "rgba(0, 255, 255, 0)",     // Transparente
+          "rgba(0, 255, 255, 1)",     // Azul claro
+          "rgba(0, 191, 255, 1)",     // Azul medio
+          "rgba(0, 127, 255, 1)",     // Azul
+          "rgba(0, 63, 255, 1)",      // Azul oscuro
+          "rgba(0, 0, 255, 1)",       // Azul profundo
+          "rgba(63, 0, 255, 1)",      // Violeta azulado
+          "rgba(127, 0, 255, 1)",     // Púrpura
+          "rgba(191, 0, 255, 1)"      // Violeta profundo
+        ];
+        heatmap.set("gradient", gradient);
+        heatmap.setMap(map)
+      }, error => {
+        Swal.fire({
+          title: "Error de carga",
+          text: "Ha ocurrido un error al cargar las incidencias",
+          icon: "error"
+        }).then();
+      });
+
+      const defaultBounds = {
+        north: center.lat + 0.1,
+        south: center.lat - 0.1,
+        east: center.lng + 0.1,
+        west: center.lng - 0.1,
+      };
+      let input = document.getElementById("pac-input") as HTMLInputElement;
+      const options = {
+        bounds: defaultBounds,
+        componentRestrictions: { country: "pe" },
+        fields: ["address_components", "geometry", "icon", "name"],
+        strictBounds: false,
+      };
+      let searchBox = new google.maps.places.SearchBox(input, options)
+
+      map.controls[google.maps.ControlPosition.LEFT_TOP].push(input);
+
+      map.addListener("bounds_changed", () => {
+        searchBox.setBounds(map.getBounds() as google.maps.LatLngBounds);
+      });
+
+      let markers: any[] = [];
+
+      searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+        if (places!.length == 0) {
+          return;
+        }
+        markers.forEach((marker) => {
+          marker.setMap(null)
+        });
+        markers = [];
+        const bounds = new google.maps.LatLngBounds();
+        places!.forEach((place) => {
+          if (!place.geometry || !place.geometry.location) {
+            return;
+          }
+
+          markers.push(
+            new AdvancedMarkerElement({
+              map,
+              title: place.name,
+              position: place.geometry.location,
+            })
+          );
+          if (place.geometry.viewport) {
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        map.fitBounds(bounds);
+      });
+
+      map.data.addListener("rightclick", (mapsMouseEvent: any) => {
+
+        this.incidenceForm.latitude = mapsMouseEvent.latLng.toJSON().lat;
+        this.incidenceForm.longitude = mapsMouseEvent.latLng.toJSON().lng;
+        this.incidenceForm.distrito = mapsMouseEvent.feature.Fg.distrito
+
+        const contentString =`
+      <title>Crime Report</title>
+      <style>
+         body {
+           font-family: Arial, sans-serif;
+           margin: 5px;
+         }
+         .info-box {
+           border: 1px solid #ccc;
+           border-radius: 8px;
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           max-width: 300px;
+           margin: auto;
+           overflow: hidden;
+         }
+         .info-header {
+           background-color: #007BFF;
+           color: white;
+           padding: 5px;
+           text-align: center;
+           font-size: 1.5em;
+         }
+         .info-content {
+           padding: 5px;
+           font-size: 1.2em;
+         }
+         .info-content p {
+           margin: 10px 0;
+         }
+         .info-label {
+           font-weight: bold;
+           color: #333;
+         }
+         .info-value {
+           color: #555;
+         }
+         .info-divider {
+           border-top: 1px solid #eee;
+           margin: 5px 0;
+         }
+       </style>
+      <body>
+        <div class="info-box">
+          <div class="info-header">
+            Crime Report
+          </div>
+          <div class="info-content">
+            <p><span class="info-label">Latitude:</span> <span class="info-value">${this.incidenceForm.latitude}</span></p>
+            <p><span class="info-label">Longitude:</span> <span class="info-value">${this.incidenceForm.longitude}</span></p>
+          </div>
+        </div>
+      </body>`;
+
+        this.infoWindow.close();
+        this.infoWindow = new google.maps.InfoWindow({
+          position: mapsMouseEvent.latLng,
+          content: contentString
+        });
+        this.infoWindow.open(map);
+
+        this.ngZone.run(() => {
+
+          this.mapDataService.getPlusCode(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng).subscribe(
+            res => {
+              this.incidenceForm.plus_code = this.extractFirstFourChars(res.plus_code.global_code)
+              this.crimesToShow = this.crimes.filter(crime =>
+                crime.plus_code === this.incidenceForm.plus_code
+              );
+              this.manageReportsWithLatLng(this.incidenceForm.plus_code).then();
+            }
+          )
+        });
+
+        this.geocoder = new google.maps.Geocoder();
+        this.geocoder.geocode(
+          {
+            'location': mapsMouseEvent.latLng,
+            'extraComputations': ["ADDRESS_DESCRIPTORS"],
+          }
+        ).then((geoRes: any) => {
+
+
+          this.streetViewService.getSignedUrl(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng,geoRes.results[0].formatted_address).subscribe(
+            resStatusImage => {
+              let img = (<HTMLImageElement>document.getElementById('photo'))
+              img.setAttribute("src", resStatusImage.body.urlImage)
+            })
+        })
+        this.hiddenLeftPanel = true;
+      });
+
+      map.data.addListener("click", (mapsMouseEvent: any) => {
+        this.ngZone.run(() => {
+          this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
+        });
+        this.openPowerBiModal()
+      });
+    });
+  }
+
+
+
   async initMap(): Promise<void> {
+
     const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
     const center = { lat: 50.064192, lng: -130.605469 };
@@ -473,6 +842,363 @@ export class MapComponent {
       this.openPowerBiModal()
     });
   }
+
+  // async initMap(): Promise<void> {
+  //   const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
+  //   const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
+  //   const center = { lat: 50.064192, lng: -130.605469 };
+  //
+  //   this.infoWindow = new google.maps.InfoWindow({
+  //     content: "Click the map to get Lat/Lng!",
+  //     position: center,
+  //   });
+  //   let map = new Map(document.getElementById("map") as HTMLElement, {
+  //     center: { lat: -12.089026, lng: -77.103876 },
+  //     zoom: 16,
+  //     // mapId: 'de588f509abe65c9',
+  //   });
+  //
+  //   map.data.addGeoJson(
+  //     this.city_polygons
+  //   );
+  //
+  //   map.data.setStyle((feature) => {
+  //     let color = "green";
+  //     return /** @type {!google.maps.Data.StyleOptions} */ {
+  //       fillColor: color,
+  //       strokeColor: color,
+  //       strokeWeight: 0.6,
+  //     };
+  //   });
+  //
+  //   map.data.addListener("mouseover", (event: any) => {
+  //     map.data.revertStyle();
+  //     map.data.overrideStyle(event.feature, { strokeWeight: 4 });
+  //   });
+  //
+  //   let placesService = new google.maps.places.PlacesService(map);
+  //
+  //   const legend = document.getElementById("legend") as HTMLElement;
+  //   const div = document.createElement("div");
+  //   div.innerHTML = `<style>
+  //   .legend {
+  //     display: flex;
+  //     align-items: center;
+  //     margin-bottom: 10px;
+  //   }
+  //   .legend-title {
+  //     font-weight: bold;
+  //     margin-right: 10px;
+  //   }
+  //   .gradient-circle {
+  //     width: 20px;
+  //     height: 20px;
+  //     border-radius: 50%;
+  //   }
+  //   .gradient1 .gradient-circle {
+  //     background: radial-gradient(
+  //       rgba(255, 0, 0, 1) 0%,
+  //       rgba(255, 63, 0, 1) 11%,
+  //       rgba(255, 127, 0, 1) 22%,
+  //       rgba(255, 191, 0, 1) 33%,
+  //       rgba(255, 255, 0, 1) 44%,
+  //       rgba(191, 255, 0, 1) 55%,
+  //       rgba(127, 255, 0, 1) 66%,
+  //       rgba(0, 255, 0, 1) 77%,
+  //       rgba(0, 255, 0, 0) 88%
+  //     );
+  //   }
+  //   .gradient2 .gradient-circle {
+  //     background: radial-gradient(
+  //       rgba(128, 0, 128, 1) 0%,
+  //       rgba(159, 0, 159, 1) 11%,
+  //       rgba(191, 0, 191, 1) 22%,
+  //       rgba(223, 0, 223, 1) 33%,
+  //       rgba(255, 0, 255, 1) 44%,
+  //       rgba(255, 63, 191, 1) 55%,
+  //       rgba(255, 127, 127, 1) 66%,
+  //       rgba(255, 191, 63, 1) 77%,
+  //       rgba(255, 255, 0, 0) 88%
+  //     );
+  //   }
+  //   .gradient3 .gradient-circle {
+  //     background: radial-gradient(
+  //       rgba(0, 0, 255, 1) 0%,
+  //       rgba(0, 63, 255, 1) 11%,
+  //       rgba(0, 127, 255, 1) 22%,
+  //       rgba(0, 191, 255, 1) 33%,
+  //       rgba(0, 255, 255, 1) 44%,
+  //       rgba(0, 255, 191, 1) 55%,
+  //       rgba(0, 255, 127, 1) 66%,
+  //       rgba(0, 255, 63, 1) 77%,
+  //       rgba(0, 255, 0, 0) 88%
+  //     );
+  //   }
+  //   </style>
+  //
+  //   <div style="background-color: white; padding-inline: 5px">
+  //     <div class="legend gradient1 justify-content-between">
+  //       <div class="legend-title">Predicciones</div>
+  //       <div class="gradient-circle"></div>
+  //     </div>
+  //
+  //     <div class="legend gradient2 justify-content-between">
+  //       <div class="legend-title">Delitos</div>
+  //       <div class="gradient-circle"></div>
+  //     </div>
+  //
+  //     <div class="legend gradient3 justify-content-between">
+  //       <div class="legend-title">Reportes</div>
+  //       <div class="gradient-circle"></div>
+  //     </div>
+  //   </div>` ;
+  //
+  //   legend.appendChild(div);
+  //
+  //   map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+  //
+  //   this.mapDataService.getPredictionCoordinates().subscribe(data => {
+  //     let heatmapData: google.maps.LatLng[] = data.body.map((res: { lat: any; lng: any; }) => {
+  //       return new google.maps.LatLng(res.lat, res.lng);
+  //     });
+  //     const heatmap = new google.maps.visualization.HeatmapLayer({
+  //       data: heatmapData
+  //     });
+  //     const gradient = [
+  //       "rgba(0, 255, 0, 0)",     // Transparente
+  //       "rgba(0, 255, 0, 1)",     // Verde
+  //       "rgba(127, 255, 0, 1)",   // Verde claro
+  //       "rgba(191, 255, 0, 1)",   // Amarillo verdoso
+  //       "rgba(255, 255, 0, 1)",   // Amarillo
+  //       "rgba(255, 191, 0, 1)",   // Naranja claro
+  //       "rgba(255, 127, 0, 1)",   // Naranja
+  //       "rgba(255, 63, 0, 1)",    // Rojo anaranjado
+  //       "rgba(255, 0, 0, 1)",
+  //     ];
+  //     heatmap.set("gradient", gradient);
+  //     heatmap.setMap(map)
+  //   });
+  //
+  //   this.mapDataService.getAllCrimes().subscribe(data => {
+  //     this.crimes = data.body;
+  //
+  //     let heatmapData: google.maps.LatLng[] = data.body.map((res: { y: any; x: any; }) => {
+  //       return new google.maps.LatLng(Number(res.y), Number(res.x)); // Asume que x es longitud y y es latitud
+  //     });
+  //     const heatmap = new google.maps.visualization.HeatmapLayer({
+  //       data: heatmapData
+  //     });
+  //     const gradient = [
+  //       "rgba(128, 0, 128, 0)",     // Transparente
+  //       "rgba(128, 0, 128, 1)",     // Púrpura oscuro
+  //       "rgba(159, 0, 159, 1)",     // Púrpura
+  //       "rgba(191, 0, 191, 1)",     // Púrpura claro
+  //       "rgba(223, 0, 223, 1)",     // Magenta
+  //       "rgba(255, 0, 255, 1)",     // Magenta intenso
+  //       "rgba(255, 63, 191, 1)",    // Rosa
+  //       "rgba(255, 127, 127, 1)",   // Rosa claro
+  //       "rgba(255, 191, 63, 1)"     // Naranja rosado
+  //     ];
+  //     heatmap.set("gradient", gradient);
+  //     heatmap.setMap(map)
+  //   }, error => {
+  //     Swal.fire({
+  //       title: "Error de carga",
+  //       text: "Ha ocurrido un error al cargar los delitos urbanos",
+  //       icon: "error"
+  //     }).then();
+  //   });
+  //
+  //   this.reportsService.getAllReports().subscribe(data => {
+  //
+  //     this.reports = data.body;
+  //
+  //     let heatmapData: google.maps.LatLng[] = this.reports.map((res: IReport) => {
+  //
+  //       return new google.maps.LatLng(Number(res.latitude), Number(res.longitude)); // Asume que x es longitud y y es latitud
+  //     });
+  //     const heatmap = new google.maps.visualization.HeatmapLayer({
+  //       data: heatmapData
+  //     });
+  //     const gradient = [
+  //       "rgba(0, 255, 255, 0)",     // Transparente
+  //       "rgba(0, 255, 255, 1)",     // Azul claro
+  //       "rgba(0, 191, 255, 1)",     // Azul medio
+  //       "rgba(0, 127, 255, 1)",     // Azul
+  //       "rgba(0, 63, 255, 1)",      // Azul oscuro
+  //       "rgba(0, 0, 255, 1)",       // Azul profundo
+  //       "rgba(63, 0, 255, 1)",      // Violeta azulado
+  //       "rgba(127, 0, 255, 1)",     // Púrpura
+  //       "rgba(191, 0, 255, 1)"      // Violeta profundo
+  //     ];
+  //     heatmap.set("gradient", gradient);
+  //     heatmap.setMap(map)
+  //   }, error => {
+  //     Swal.fire({
+  //       title: "Error de carga",
+  //       text: "Ha ocurrido un error al cargar las incidencias",
+  //       icon: "error"
+  //     }).then();
+  //   });
+  //
+  //   const defaultBounds = {
+  //     north: center.lat + 0.1,
+  //     south: center.lat - 0.1,
+  //     east: center.lng + 0.1,
+  //     west: center.lng - 0.1,
+  //   };
+  //   let input = document.getElementById("pac-input") as HTMLInputElement;
+  //   const options = {
+  //     bounds: defaultBounds,
+  //     componentRestrictions: { country: "pe" },
+  //     fields: ["address_components", "geometry", "icon", "name"],
+  //     strictBounds: false,
+  //   };
+  //   let searchBox = new google.maps.places.SearchBox(input, options)
+  //
+  //   map.controls[google.maps.ControlPosition.LEFT_TOP].push(input);
+  //
+  //   map.addListener("bounds_changed", () => {
+  //     searchBox.setBounds(map.getBounds() as google.maps.LatLngBounds);
+  //   });
+  //
+  //   let markers: any[] = [];
+  //
+  //   searchBox.addListener("places_changed", () => {
+  //     const places = searchBox.getPlaces();
+  //     if (places!.length == 0) {
+  //       return;
+  //     }
+  //     markers.forEach((marker) => {
+  //       marker.setMap(null)
+  //     });
+  //     markers = [];
+  //     const bounds = new google.maps.LatLngBounds();
+  //     places!.forEach((place) => {
+  //       if (!place.geometry || !place.geometry.location) {
+  //         return;
+  //       }
+  //
+  //       markers.push(
+  //         new AdvancedMarkerElement({
+  //           map,
+  //           title: place.name,
+  //           position: place.geometry.location,
+  //         })
+  //       );
+  //       if (place.geometry.viewport) {
+  //         bounds.union(place.geometry.viewport);
+  //       } else {
+  //         bounds.extend(place.geometry.location);
+  //       }
+  //     });
+  //     map.fitBounds(bounds);
+  //   });
+  //
+  //   map.data.addListener("rightclick", (mapsMouseEvent: any) => {
+  //
+  //     this.incidenceForm.latitude = mapsMouseEvent.latLng.toJSON().lat;
+  //     this.incidenceForm.longitude = mapsMouseEvent.latLng.toJSON().lng;
+  //     this.incidenceForm.distrito = mapsMouseEvent.feature.Fg.distrito
+  //
+  //     const contentString =`
+  //     <title>Crime Report</title>
+  //     <style>
+  //        body {
+  //          font-family: Arial, sans-serif;
+  //          margin: 5px;
+  //        }
+  //        .info-box {
+  //          border: 1px solid #ccc;
+  //          border-radius: 8px;
+  //          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  //          max-width: 300px;
+  //          margin: auto;
+  //          overflow: hidden;
+  //        }
+  //        .info-header {
+  //          background-color: #007BFF;
+  //          color: white;
+  //          padding: 5px;
+  //          text-align: center;
+  //          font-size: 1.5em;
+  //        }
+  //        .info-content {
+  //          padding: 5px;
+  //          font-size: 1.2em;
+  //        }
+  //        .info-content p {
+  //          margin: 10px 0;
+  //        }
+  //        .info-label {
+  //          font-weight: bold;
+  //          color: #333;
+  //        }
+  //        .info-value {
+  //          color: #555;
+  //        }
+  //        .info-divider {
+  //          border-top: 1px solid #eee;
+  //          margin: 5px 0;
+  //        }
+  //      </style>
+  //     <body>
+  //       <div class="info-box">
+  //         <div class="info-header">
+  //           Crime Report
+  //         </div>
+  //         <div class="info-content">
+  //           <p><span class="info-label">Latitude:</span> <span class="info-value">${this.incidenceForm.latitude}</span></p>
+  //           <p><span class="info-label">Longitude:</span> <span class="info-value">${this.incidenceForm.longitude}</span></p>
+  //         </div>
+  //       </div>
+  //     </body>`;
+  //
+  //     this.infoWindow.close();
+  //     this.infoWindow = new google.maps.InfoWindow({
+  //       position: mapsMouseEvent.latLng,
+  //       content: contentString
+  //     });
+  //     this.infoWindow.open(map);
+  //
+  //     this.ngZone.run(() => {
+  //
+  //       this.mapDataService.getPlusCode(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng).subscribe(
+  //         res => {
+  //           this.incidenceForm.plus_code = this.extractFirstFourChars(res.plus_code.global_code)
+  //           this.crimesToShow = this.crimes.filter(crime =>
+  //             crime.plus_code === this.incidenceForm.plus_code
+  //           );
+  //           this.manageReportsWithLatLng(this.incidenceForm.plus_code).then();
+  //         }
+  //       )
+  //     });
+  //
+  //     this.geocoder = new google.maps.Geocoder();
+  //     this.geocoder.geocode(
+  //       {
+  //         'location': mapsMouseEvent.latLng,
+  //         'extraComputations': ["ADDRESS_DESCRIPTORS"],
+  //       }
+  //     ).then((geoRes: any) => {
+  //
+  //
+  //       this.streetViewService.getSignedUrl(mapsMouseEvent.latLng.toJSON().lat, mapsMouseEvent.latLng.toJSON().lng,geoRes.results[0].formatted_address).subscribe(
+  //         resStatusImage => {
+  //           let img = (<HTMLImageElement>document.getElementById('photo'))
+  //           img.setAttribute("src", resStatusImage.body.urlImage)
+  //         })
+  //     })
+  //     this.hiddenLeftPanel = true;
+  //   });
+  //
+  //   map.data.addListener("click", (mapsMouseEvent: any) => {
+  //     this.ngZone.run(() => {
+  //       this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
+  //     });
+  //     this.openPowerBiModal()
+  //   });
+  // }
 
   async manageReportsWithLatLng(global_code: string){
     this.reportsService.getAllReports().subscribe(

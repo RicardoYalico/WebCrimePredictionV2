@@ -6,5 +6,6 @@ export const environment = {
   postReportFunction: 'https://8yi27bsvt0.execute-api.us-east-1.amazonaws.com/dev',
   getReportsFunction:'https://8yi27bsvt0.execute-api.us-east-1.amazonaws.com/dev',
 
-  feedbackUrl: 'https://formspree.io/f/xovazbvy'
+  feedbackUrl: 'https://formspree.io/f/xovazbvy',
+
 };
