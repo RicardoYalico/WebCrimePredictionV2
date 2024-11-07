@@ -6,25 +6,22 @@ import {
 import {RouterOutlet} from '@angular/router';
 import '@googlemaps/extended-component-library/place_overview.js';
 import '@googlemaps/extended-component-library/place_building_blocks/place_directions_button.js';
-import {MapDataService} from "../services/map-data.service";
-import {ReportsService} from "../services/reports.service";
+import {MapDataService} from "./core/services/map-data.service";
+import {ReportsService} from "./core/services/reports.service";
 import {HttpClient, HttpClientModule, HttpHeaders} from "@angular/common/http";
 import {DatePipe, NgClass, NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import { PowerBIEmbedModule } from 'powerbi-client-angular';
 import { Loader } from "@googlemaps/js-api-loader"
-import {ChildComponent} from "./child/child.component";
-import {ParentComponent} from "./parent/parent.component";
 import {FormControl, FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators} from "@angular/forms";
-import {NotImageDirective} from "../shared/directives/not-image.directive";
-import {DemoComponent} from "./demo/demo.component";
-import {MapComponent} from "./map/map.component";
-import {StreetViewService} from "../core/services/street-view.service";
+import {NotImageDirective} from "./shared/directives/not-image.directive";
+import {MapComponent} from "./features/map/map.component";
+import {StreetViewService} from "./core/services/street-view.service";
 import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HttpClientModule, NgOptimizedImage, NgForOf, PowerBIEmbedModule, ChildComponent, ParentComponent, NgIf, NgClass, DatePipe, FormsModule, ReactiveFormsModule, NotImageDirective, DemoComponent, MapComponent],
+  imports: [RouterOutlet, HttpClientModule, NgOptimizedImage, NgForOf, PowerBIEmbedModule, NgIf, NgClass, DatePipe, FormsModule, ReactiveFormsModule, NotImageDirective, MapComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [MapDataService, ReportsService, StreetViewService, StreetViewService],
   templateUrl: './app.component.html',

@@ -1,17 +1,13 @@
 import {
   Component,
   ElementRef,
-  Input,
-  OnChanges,
   OnInit,
-  SimpleChanges,
   ViewChild,
-  ViewContainerRef
 } from '@angular/core';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {IReport} from "../../../interfaces/IReport";
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {IReport} from "../../../core/models/IReport";
 import Swal from "sweetalert2";
-import {ReportsService} from "../../../services/reports.service";
+import {ReportsService} from "../../../core/services/reports.service";
 import {IIncidenceForm} from "../../../core/models/IIncidenceForm";
 import * as report from "report";
 import {NgIf} from "@angular/common";
@@ -29,10 +25,8 @@ import {NgIf} from "@angular/common";
 })
 export class IncidenceFormComponent implements OnInit{
   @ViewChild('closeModal') closeModal!: ElementRef
-  // @ViewChild('incidenceFormControl') incidenceFormControl!: any;
   loading: boolean = false;
   incidenceFormGroup: FormGroup;
-  distritoPorDefecto: string = 'SAN MIGUEL';
   bootstrap: any;
   incidenceForm: IIncidenceForm = {
     title: '',

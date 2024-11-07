@@ -1,10 +1,9 @@
-import {Component, EventEmitter, Input, OnInit, OnChanges, SimpleChanges, AfterViewInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {models} from "powerbi-client";
 import {IReportEmbedConfiguration} from "embed";
 import {PowerBIEmbedModule} from "powerbi-client-angular";
-import * as pbi from 'powerbi-client'
 import {NgForOf} from "@angular/common";
-import {IDistrict} from "../../core/models/idistrict";
+import {IDistrict} from "../../../core/models/idistrict";
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -46,9 +45,8 @@ export class PowerbiModalComponent {
     }
   };
 
-  createSingleComponent(district: string, powerBiToken: string){
+  createSingleComponent(district: string){
     let id = uuidv4();
-    // this.embedConfig.embedUrl = `https://app.powerbi.com/reportEmbed?reportId=001cedf1-13df-4420-bad7-e976e4c24c03&groupId=37078e78-d47f-4fbd-9d27-cc69e1e4121a&filter=CrimeCoordinatesWithPlusCode%2Fdistrito%20eq%20%27${district}%27`;
     this.embedConfig.embedUrl = `https://app.powerbi.com/reportEmbed?reportId=001cedf1-13df-4420-bad7-e976e4c24c03&groupId=37078e78-d47f-4fbd-9d27-cc69e1e4121a&filter=CrimeCoordinatesWithPlusCode%2Fdistrito%20eq%20%27${district}%27 and UserReports/distrito%20eq%20%27${district}%27`;
     this.componentsCount = []
     this.componentsCount.push({district: district, id: id})
@@ -63,8 +61,5 @@ export class PowerbiModalComponent {
         }
       }
     }, 1200)
-  }
-  ngAfterViewInit(): void {
-
   }
 }

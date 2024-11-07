@@ -2,13 +2,12 @@ import {Component, NgZone, ViewChild} from '@angular/core';
 import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NotImageDirective} from "../../shared/directives/not-image.directive";
-import {ParentComponent} from "../parent/parent.component";
-import {IReport} from "../../interfaces/IReport";
-import {MapDataService} from "../../services/map-data.service";
-import {ReportsService} from "../../services/reports.service";
-import {PowerbiModalComponent} from "../powerbi-modal/powerbi-modal.component";
+import {IReport} from "../../core/models/IReport";
+import {MapDataService} from "../../core/services/map-data.service";
+import {ReportsService} from "../../core/services/reports.service";
+import {PowerbiModalComponent} from "../../shared/components/powerbi-modal/powerbi-modal.component";
 import {IncidenceFormComponent} from "../../shared/components/incidence-form/incidence-form.component";
-import {SideBarComponent} from "../side-bar/side-bar.component";
+import {SideBarComponent} from "../../shared/components/side-bar/side-bar.component";
 import {IIncidenceForm} from "../../core/models/IIncidenceForm";
 import {Loader} from "@googlemaps/js-api-loader";
 import Swal from "sweetalert2";
@@ -24,7 +23,6 @@ import {StreetViewService} from "../../core/services/street-view.service";
     NgForOf,
     NgIf,
     NotImageDirective,
-    ParentComponent,
     ReactiveFormsModule,
     PowerbiModalComponent,
     NgClass,
@@ -470,7 +468,7 @@ export class MapComponent {
 
     map.data.addListener("click", (mapsMouseEvent: any) => {
       this.ngZone.run(() => {
-        this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito, this.powerBiToken);
+        this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
       });
       this.openPowerBiModal()
     });

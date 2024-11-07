@@ -1,9 +1,8 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
-import {IncidenceFormComponent} from "../../shared/components/incidence-form/incidence-form.component";
-import {NotImageDirective} from "../../shared/directives/not-image.directive";
-import {IIncidenceForm} from "../../core/models/IIncidenceForm";
-import {StreetViewService} from "../../core/services/street-view.service";
+import {IncidenceFormComponent} from "../incidence-form/incidence-form.component";
+import {NotImageDirective} from "../../directives/not-image.directive";
+import {IIncidenceForm} from "../../../core/models/IIncidenceForm";
 
 @Component({
   selector: 'app-side-bar',
@@ -21,7 +20,6 @@ import {StreetViewService} from "../../core/services/street-view.service";
 export class SideBarComponent implements OnInit, OnChanges{
   @ViewChild('IncidenceModalForm') IncidenceModalForm!: IncidenceFormComponent;
   @Output() closeSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
-  hiddenLeftPanel: boolean = false;
   loading: boolean = true;
   formated_address: string = '';
   @Input() crimesToShow: any[] = []
@@ -37,7 +35,7 @@ export class SideBarComponent implements OnInit, OnChanges{
   };
   bootstrap: any
 
-  constructor(private streetViewService: StreetViewService) {
+  constructor() {
   }
 
   openFormReportModal() {
@@ -51,41 +49,19 @@ export class SideBarComponent implements OnInit, OnChanges{
   }
 
   ngOnInit(): void {
-
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.loading = true;
     this.formated_address = ''
     let geocoder = new google.maps.Geocoder();
-    // let placesService = new google.maps.places.PlacesService(map);
-
     geocoder.geocode(
       {
         'location': {lat: Number(this.incidenceForm.latitude), lng: Number(this.incidenceForm.longitude)},
-        // 'extraComputations': ['ADDRESS_DESCRIPTORS'],
       }
     ).then((res: any) => {
-
       this.formated_address = res.results[0].formatted_address;
-
       this.loading = false;
-      // this.currently_address = {
-      //   address: res.results[0].formatted_address,
-      // };
-      let request = {
-        placeId: res.results[0].place_id,
-        fields: ['name', 'rating', 'formatted_phone_number', 'geometry', 'photo']
-      };
-
-      // placesService.getDetails(request, (response: any) => {
-      //   let img = (<HTMLImageElement>document.getElementById('photo'))
-      //
-      //   img.setAttribute("src", response.photos[0].getUrl())
-      // })
-
-      // window.document.getElementById("address")!.innerHTML = res.results[0].formatted_address;
-      // window.document.getElementById("latLng")!.innerHTML = mapsMouseEvent.latLng;
     })
   }
 
