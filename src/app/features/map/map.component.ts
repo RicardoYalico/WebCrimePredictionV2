@@ -836,12 +836,12 @@ export class MapComponent {
       this.hiddenLeftPanel = true;
     });
 
-    // map.data.addListener("click", (mapsMouseEvent: any) => {
-    //   this.ngZone.run(() => {
-    //     this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
-    //   });
-    //   this.openPowerBiModal()
-    // });
+    map.data.addListener("click", (mapsMouseEvent: any) => {
+      this.ngZone.run(() => {
+        this.powerBiModalRef.createSingleComponent(mapsMouseEvent.feature.Fg.distrito);
+      });
+      this.openPowerBiModal()
+    });
   }
 
   // async initMap(): Promise<void> {
